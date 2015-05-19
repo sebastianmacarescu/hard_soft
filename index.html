@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="/css/vendor/bootstrap.min.css">
+		<link rel="stylesheet" href="/css/flat-ui.css">
+		<link rel="stylesheet" href="/css/style.css">
+		
+	</head>
+	<body>
+		<div class="container">
+			<nav class="navbar navbar-inverse navbar-static tspace80">
+			  <div class="container">
+			    <div class="navbar-header">
+			      <a class="navbar-brand" href="#">
+			      	<img src="/img/usv_logo.png">
+			      </a>
+			    </div>
+			    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			      <ul class="nav navbar-nav navbar-right">
+			        <li><a href="#" id="deviceStatus" class="disconnected"><span class="navbar-unread">1</span> <p class="bspace0">Device not connected</p> </a></li>
+			        
+			      </ul>
+			    </div>
+			  </div>
+			</nav>
+			<div class="row tspace40">
+				<div class="col-lg-12">
+					
+				</div>
+			</div>
+			<div class="row tspace20">
+				<div class="col-lg-2" id="bodyTemperature">
+					<div class="panel panel-default">
+						<div class="panel-heading text-center">
+							Body Temperature
+						</div>
+						<div class="panel-body">
+							<div class="thermometer" style=""></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-7">
+					<div class="panel panel-warning">
+						<textarea rows="20" cols="60" id="debugger" style="font-size: 14px;width: 100%;">
+
+						</textarea>
+					</div>
+				</div>
+				<div class="col-lg-3">
+					<div class="panel panel-danger">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="/socket.io/socket.io.js"></script>
+    	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+		<script type="text/javascript">
+			var socket = io.connect();
+			var deviceStatus = ["Device not connected", "Device connected", "Device transmitting!"]
+			var deviceStatusClass = ["disconnected", "connected", "transmitting"]
+
+			socket.on('JSON', function(data){
+			  $('#deviceStatus').attr('class', deviceStatusClass[2]);
+			  $('#deviceStatus p').html(deviceStatus[2]);
+			  var debugger_data = $('#debugger').val();
+			  $('#debugger').val(debugger_data+data);
+			  var array = JSON.parse(data)
+			  console.log(array);
+			  var bodyTemp = array["bodyTemp"];
+			  $('.thermometer').css('height',bodyTemp*7);
+			});
+			socket.on('devConnected', function(data){
+				$('#deviceStatus').attr('class', deviceStatusClass[1]);
+				$('#deviceStatus p').html(deviceStatus[1]);
+			});
+			socket.on('devDisconnected', function(data){
+				$('#deviceStatus').attr('class', deviceStatusClass[0]);
+				$('#deviceStatus p').html(deviceStatus[0]);
+			});
+		</script>
+	</body>
+</html>
